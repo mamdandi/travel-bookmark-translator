@@ -27,7 +27,7 @@ def setup():
 
 @app.get('/health')
 def health():
-    return jsonify(status='ready' if ready else ('error' if error else 'loading'), pairs=[list(p) for p in sorted(installed)], error=error)
+    return jsonify(status='ready' if ready else ('error' if error else ('loading' if os.environ.get('ENABLE_MODELS') == '1' else 'diagnostic')), pairs=[list(p) for p in sorted(installed)], error=error)
 
 @app.post('/translate')
 def translate():
@@ -50,7 +50,8 @@ def translate():
         return jsonify(error='translation_unavailable'),503
 
 if __name__ == '__main__':
-    threading.Thread(target=setup,daemon=True).start()
+    if os.environ.get('ENABLE_MODELS') == '1':
+        threading.Thread(target=setup,daemon=True).start()
     app.run(host='0.0.0.0',port=int(os.environ.get('PORT','10000')))
 else:
     threading.Thread(target=setup,daemon=True).start()
