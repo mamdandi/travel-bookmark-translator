@@ -11,6 +11,16 @@ def health():
     packages = [p.name for p in model_dir.glob('*') if p.is_dir()] if model_dir.exists() else []
     return jsonify(status='ready' if packages else 'no_model', packages=packages)
 
+@app.get('/test')
+def test_translation():
+    try:
+        import argostranslate.translate
+        source_text = '부산 가족 여행'
+        result = argostranslate.translate.translate(source_text, 'ko', 'en')
+        return jsonify(status='ok', original=source_text, translatedText=result)
+    except Exception as exc:
+        return jsonify(status='error', error=str(exc)[:180]),503
+
 @app.post('/translate')
 def translate():
     data = request.get_json(silent=True) or {}
