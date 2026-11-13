@@ -14,12 +14,14 @@ def setup():
         import argostranslate.translate
         argostranslate.package.update_package_index()
         available = argostranslate.package.get_available_packages()
-        for src, dst in [('ko','en'),('en','ko'),('en','ja'),('ja','en')]:
+        for src, dst in [('ko','en')]:
             match = next((p for p in available if p.from_code == src and p.to_code == dst), None)
             if match:
                 argostranslate.package.install_from_path(match.download())
                 installed.add((src,dst))
-        ready = True
+        ready = bool(installed)
+        if not ready:
+            error = 'ko-en model unavailable'
     except Exception as exc:
         error = str(exc)[:300]
 
